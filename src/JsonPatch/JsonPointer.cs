@@ -4,6 +4,12 @@ using Newtonsoft.Json.Linq;
 
 namespace Tavis
 {
+    public class PathNotFoundException : Exception {
+
+        public PathNotFoundException(string message) : base(message) { }
+        public PathNotFoundException(string message, Exception innerException) : base(message, innerException) { }
+    }
+
     public class JsonPointer
     {
         private readonly string[] _Tokens;
@@ -45,24 +51,40 @@ namespace Tavis
             try
             {
                 var pointer = sample;
-                foreach (var token in _Tokens)
+
+                for (int depth = 0; depth < _Tokens.Length; depth++)
                 {
+                    string token = _Tokens[depth];
+
                     if (pointer is JArray)
                     {
-                        pointer = pointer[Convert.ToInt32(token)];
+                        try
+                        {
+                            pointer = pointer[Convert.ToInt32(token)];
+                        } catch (InvalidCastException e)
+                        {
+                            throw new PathNotFoundException("Cannot traverse beyond depth " + depth + ". The json token at this depth is an array, but non-integer value " + token + " was supplied", e);
+                        } catch (IndexOutOfRangeException e)
+                        {
+                            throw new PathNotFoundException("Cannot traverse beyond depth " + depth + ". The json token at this depth is an array, but integer value " + token + " is out of range", e);
+                        }
                     }
                     else
                     {
                         pointer = pointer[token];
+
                         if (pointer == null)
                         {
-                            throw new ArgumentException("Cannot find " + token);
+                            throw new PathNotFoundException("Cannot traverse beyond depth " + depth + ". Token " + token + " was not found");
                         }
-
                     }
+
+                    depth++;
                 }
+
                 return pointer;
             }
+
             catch (Exception ex)
             {
                 throw new ArgumentException("Failed to dereference pointer", ex);
