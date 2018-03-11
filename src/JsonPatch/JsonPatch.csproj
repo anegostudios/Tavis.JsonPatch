@@ -36,20 +36,18 @@
     <Compile Include="BaseTargetAdapter.cs" />
     <Compile Include="IPatchTarget.cs" />
     <Compile Include="JsonNetTargetAdapter.cs" />
+    <Compile Include="JsonPointer.cs" />
     <Compile Include="Operation.cs" />
     <Compile Include="PatchDocument.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\..\packages\Newtonsoft.Json.5.0.8\lib\portable-net40+sl4+wp7+win8\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="Tavis.JsonPointer">
-      <HintPath>..\..\packages\Tavis.JsonPointer.0.5.0-beta\lib\portable-wp71+sl4+netcore45+net4\Tavis.JsonPointer.dll</HintPath>
-    </Reference>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\lib\Newtonsoft.Json.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
