@@ -22,39 +22,22 @@ namespace Tavis
 
         protected override void Add(AddOperation operation)
         {
-            JToken token = null;
-            JObject parenttoken = null;
-            try
-            {
-                if (operation.Path.IsNewPointer())
-                {
-                    var parentPointer = operation.Path.ParentPointer;
-                    token = parentPointer.Find(_target) as JArray;
-                }
-                else
-                {
-                    token = operation.Path.Find(_target);
-                }
-            }
-            catch (ArgumentException)
-            {
-                var parentPointer = operation.Path.ParentPointer;
-                parenttoken = parentPointer.Find(_target) as JObject;
-            }
+            var parentPointer = operation.Path.ParentPointer;
+            var token = parentPointer.Find(_target);
+            // FIXME: Probably fails if path points to root element, which *should* replace the entire document with the specified value.
 
-            if (token == null && parenttoken != null)
+            int index;
+            if (int.TryParse(operation.Path.Last, out index))
             {
-                parenttoken.Add(operation.Path.ToString().Split('/').Last(), operation.Value);
+                ((JArray)token).Insert(index, operation.Value);
             }
-            else if (token is JArray)
+            else if (operation.Path.Last == "-")
             {
-                var array = token as JArray;
-                array.Add(operation.Value);
+                ((JArray)token).Add(operation.Value);
             }
-            else if (token.Parent is JProperty)
+            else
             {
-                var prop = token.Parent as JProperty;
-                prop.Value = operation.Value;
+                ((JObject)token)[operation.Path.Last] = operation.Value;
             }
         }
 

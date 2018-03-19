@@ -32,6 +32,26 @@ namespace JsonPatchTests
         }
 
         [Fact]
+        public void Insert_an_array_element()
+        {
+
+            var sample = PatchTests.GetSample2();
+
+            var patchDocument = new PatchDocument();
+            var pointer = new JsonPointer("/books/0");
+
+            patchDocument.AddOperation(new AddOperation() { Path = pointer, Value = new JObject(new[] { new JProperty("author", "James Brown") }) });
+
+            patchDocument.ApplyTo(sample);
+
+            var list = sample["books"] as JArray;
+
+            Assert.Equal(3, list.Count);
+            Assert.Equal((string)sample["books"][0]["author"], "James Brown");
+
+        }
+
+        [Fact]
         public void Add_an_existing_member_property()  // Why isn't this replace?
         {
 

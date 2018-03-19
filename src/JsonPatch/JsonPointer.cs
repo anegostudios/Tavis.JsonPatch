@@ -14,6 +14,11 @@ namespace Tavis
     {
         private readonly string[] _Tokens;
 
+        public string Last
+        {
+            get { return _Tokens[_Tokens.Length - 1]; }
+        }
+
         public JsonPointer(string pointer)
         {
             _Tokens = pointer.Split('/').Skip(1).Select(Decode).ToArray();
@@ -26,11 +31,6 @@ namespace Tavis
         private string Decode(string token)
         {
             return Uri.UnescapeDataString(token).Replace("~1", "/").Replace("~0", "~");
-        }
-
-        public bool IsNewPointer()
-        {
-            return _Tokens.Last() == "-";
         }
 
         public JsonPointer ParentPointer
