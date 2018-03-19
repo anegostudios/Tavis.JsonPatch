@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.27130.2003
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonPatchTests", "src\JsonPatchTests\JsonPatchTests.csproj", "{1FCBC3F6-73A3-4686-9A8B-A7709CF1C198}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonPatch", "src\JsonPatch\JsonPatch.csproj", "{25B26368-23E0-479C-B8DE-12B296587049}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tavis.JsonPatch", "src\JsonPatch\Tavis.JsonPatch.csproj", "{25B26368-23E0-479C-B8DE-12B296587049}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

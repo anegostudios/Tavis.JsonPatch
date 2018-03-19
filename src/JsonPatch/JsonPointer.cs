@@ -48,47 +48,40 @@ namespace Tavis
             {
                 return sample;
             }
-            try
-            {
-                var pointer = sample;
 
-                for (int depth = 0; depth < _Tokens.Length; depth++)
+            var pointer = sample;
+
+            for (int depth = 0; depth < _Tokens.Length; depth++)
+            {
+                string token = _Tokens[depth];
+
+                if (pointer is JArray)
                 {
-                    string token = _Tokens[depth];
-
-                    if (pointer is JArray)
+                    try
                     {
-                        try
-                        {
-                            pointer = pointer[Convert.ToInt32(token)];
-                        } catch (InvalidCastException e)
-                        {
-                            throw new PathNotFoundException("Cannot traverse beyond depth " + depth + ". The json token at this depth is an array, but non-integer value " + token + " was supplied", e);
-                        } catch (IndexOutOfRangeException e)
-                        {
-                            throw new PathNotFoundException("Cannot traverse beyond depth " + depth + ". The json token at this depth is an array, but integer value " + token + " is out of range", e);
-                        }
+                        pointer = pointer[Convert.ToInt32(token)];
                     }
-                    else
+                    catch (InvalidCastException e)
                     {
-                        pointer = pointer[token];
-
-                        if (pointer == null)
-                        {
-                            throw new PathNotFoundException("Cannot traverse beyond depth " + depth + ". Token " + token + " was not found");
-                        }
+                        throw new PathNotFoundException("Cannot traverse beyond depth " + depth + ". The json token at this depth is an array, but non-integer value " + token + " was supplied", e);
                     }
-
-                    depth++;
+                    catch (IndexOutOfRangeException e)
+                    {
+                        throw new PathNotFoundException("Cannot traverse beyond depth " + depth + ". The json token at this depth is an array, but integer value " + token + " is out of range", e);
+                    }
                 }
+                else
+                {
+                    pointer = pointer[token];
 
-                return pointer;
+                    if (pointer == null)
+                    {
+                        throw new PathNotFoundException("Cannot traverse beyond depth " + depth + ". Token " + token + " was not found");
+                    }
+                }
             }
 
-            catch (Exception ex)
-            {
-                throw new ArgumentException("Failed to dereference pointer", ex);
-            }
+            return pointer;
         }
 
         public override string ToString()

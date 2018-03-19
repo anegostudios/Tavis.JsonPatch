@@ -62,9 +62,9 @@
     <EmbeddedResource Include="Samples\LoadTest1.json" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\JsonPatch\JsonPatch.csproj">
+    <ProjectReference Include="..\JsonPatch\Tavis.JsonPatch.csproj">
       <Project>{25b26368-23e0-479c-b8de-12b296587049}</Project>
-      <Name>JsonPatch</Name>
+      <Name>Tavis.JsonPatch</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
