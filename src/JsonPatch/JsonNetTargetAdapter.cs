@@ -22,61 +22,45 @@ namespace Tavis
 
         protected override void Add(AddOperation operation)
         {
-            var parentPointer = operation.Path.ParentPointer;
-            var token = parentPointer.Find(_target);
-            // FIXME: Probably fails if path points to root element, which *should* replace the entire document with the specified value.
+            var token = operation.Path.Find(_target, skipLast: true);
 
             int index;
             if (int.TryParse(operation.Path.Last, out index))
-            {
                 ((JArray)token).Insert(index, operation.Value);
-            }
             else if (operation.Path.Last == "-")
-            {
                 ((JArray)token).Add(operation.Value);
-            }
-            else
-            {
-                ((JObject)token)[operation.Path.Last] = operation.Value;
-            }
+            else token[operation.Path.Last] = operation.Value;
         }
 
 
         protected override void Remove(RemoveOperation operation)
         {
             var token = operation.Path.Find(_target);
-            if (token.Parent is JProperty)
-            {
-                token.Parent.Remove();
-            }
-            else
-            {
-                token.Remove();
-            }
+            token.Remove();
         }
 
         protected override void Move(MoveOperation operation)
         {
-            if (operation.Path.ToString().StartsWith(operation.FromPath.ToString())) throw new ArgumentException("To path cannot be below from path");
+            if (operation.Path.ToString().StartsWith(operation.FromPath.ToString()))
+                throw new ArgumentException("To path cannot be below from path");
 
             var token = operation.FromPath.Find(_target);
-            Remove(new RemoveOperation(){Path = operation.FromPath});
-            Add(new AddOperation() {Path = operation.Path, Value = token});
+            Add(new AddOperation { Path = operation.Path, Value = token });
+            Remove(new RemoveOperation { Path = operation.FromPath });
         }
 
         protected override void Test(TestOperation operation)
         {
             var existingValue = operation.Path.Find(_target);
-            if (!existingValue.Equals(_target))
-            {
-                throw new InvalidOperationException("Value at " + operation.Path.ToString() + " does not match.");
-            }
+            if (!existingValue.Equals(_target)) throw new InvalidOperationException(
+                $"Value at { operation.Path } does not match.");
         }
 
         protected override void Copy(CopyOperation operation)
         {
-            var token = operation.FromPath.Find(_target);  // Do I need to clone this?
-            Add(new AddOperation() {Path = operation.Path, Value = token});
+            var token = operation.FromPath.Find(_target);
+            token = token.DeepClone();
+            Add(new AddOperation { Path = operation.Path, Value = token });
         }
     }
 }
