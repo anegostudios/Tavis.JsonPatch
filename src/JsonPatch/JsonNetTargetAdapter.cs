@@ -36,6 +36,7 @@ namespace Tavis
         protected override void Remove(RemoveOperation operation)
         {
             var token = operation.Path.Find(_target);
+            if (token is JProperty) token = token.Parent;
             token.Remove();
         }
 
