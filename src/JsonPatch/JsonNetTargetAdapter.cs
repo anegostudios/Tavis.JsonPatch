@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 
 namespace Tavis
 {
@@ -35,8 +36,15 @@ namespace Tavis
 
         protected override void Remove(RemoveOperation operation)
         {
-            var token = operation.Path.Find(_target);
-            token.Remove();
+            JToken token = operation.Path.Find(_target);
+
+            if (token is JValue)
+            {
+                token.Parent.Remove();
+            } else
+            {
+                token.Remove();
+            }
         }
 
         protected override void Move(MoveOperation operation)

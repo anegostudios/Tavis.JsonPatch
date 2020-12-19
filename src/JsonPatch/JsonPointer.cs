@@ -12,6 +12,7 @@ namespace Tavis
             : base(message, innerException) { }
     }
 
+
     public class JsonPointer
     {
         private readonly string[] _Tokens;
@@ -24,8 +25,12 @@ namespace Tavis
 
         public bool IsRoot { get { return (Depth == 0); } }
 
+        string origPointer;
+
         public JsonPointer(string pointer)
         {
+            this.origPointer = pointer;
+
             _Tokens = (pointer != "/")
                 ? pointer.Split('/').Skip(1).Select(Decode).ToArray()
                 : new string[0];
@@ -40,18 +45,42 @@ namespace Tavis
                 var token  = _Tokens[depth];
                 var parent = pointer;
 
-                try {
-                    int index;
-                    if (int.TryParse(token, out index))
-                        pointer = pointer[index];
-                    else pointer = pointer[token];
-                } catch (Exception ex) { throw new PathNotFoundException(
-                    $"Cannot traverse beyond '{ ToString(depth + 1) }'. " +
-                    $"Parent at this depth is a { parent.GetType().Name }.", ex); }
+                int index;
+                bool isInt = int.TryParse(token, out index);
 
-                if (pointer == null) throw new PathNotFoundException(
-                    $"Cannot traverse beyond '{ ToString(depth + 1) }'. " +
-                    $"Parent at this depth is a { parent.GetType().Name }.");
+                Exception ex = null;
+
+                try {
+
+                    if (isInt)
+                    {
+                        pointer = pointer[index];
+                    }
+                    else
+                    {
+                        pointer = pointer[token];
+                    }
+
+                } catch (Exception exception) {
+                    pointer = null;
+                    ex = exception;
+                }
+
+                if (pointer == null)
+                {
+                    if (depth > 0)
+                    {
+                        string foundPath = _Tokens.Take(depth).Aggregate("", (a,b) => a +"/"+b);
+                        throw new PathNotFoundException(string.Format(
+                            "The json path {0} was not found. Could traverse until {1}, but then '{2}' does not exist. Full json at this path: {3}", origPointer, foundPath, _Tokens[depth], parent.ToString()
+                        ), ex);
+                    } else
+                    {
+                        throw new PathNotFoundException(string.Format(
+                            "The json path {0} was not found. No such element '{1}' at the root path", origPointer, _Tokens[0]
+                        ), ex);
+                    }
+                }
             }
 
             return pointer;

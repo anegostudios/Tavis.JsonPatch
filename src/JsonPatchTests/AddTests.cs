@@ -15,11 +15,10 @@ namespace JsonPatchTests
         [Fact]
         public void Add_an_array_element()
         {
-
             var sample = PatchTests.GetSample2();
 
             var patchDocument = new PatchDocument();
-            var pointer = new JsonPointer("/books");
+            var pointer = new JsonPointer("/books/-");
 
             patchDocument.AddOperation(new AddOperation() { Path = pointer, Value = new JObject(new[] { new JProperty("author", "James Brown") }) });
 

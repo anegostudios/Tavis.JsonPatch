@@ -23,7 +23,7 @@ namespace JsonPatchTests
 
             patchDocument.ApplyTo(sample);
 
-            Assert.Throws(typeof(ArgumentException), () => { pointer.Find(sample); });
+            Assert.Throws(typeof(PathNotFoundException), () => { pointer.Find(sample); });
         }
 
         [Fact]
@@ -39,7 +39,7 @@ namespace JsonPatchTests
 
             patchDocument.ApplyTo(sample);
 
-            Assert.Throws(typeof(ArgumentException), () =>
+            Assert.Throws(typeof(PathNotFoundException), () =>
             {
                 var x = pointer.Find("/books/1");
             });
