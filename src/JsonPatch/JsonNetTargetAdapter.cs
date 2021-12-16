@@ -34,6 +34,40 @@ namespace Tavis
         }
 
 
+        protected override void AddEach(AddEachOperation operation)
+        {
+            var token = operation.Path.Find(_target, skipLast: true);
+
+            var jarr = operation.Value as JArray;
+
+            if (jarr == null)
+            {
+                throw new ArgumentException("Value must be a JArray");
+            }
+
+            int index;
+            if (int.TryParse(operation.Path.Last, out index))
+            {
+                foreach (var value in jarr)
+                {
+                    ((JArray)token).Insert(index++, value);
+                }
+            }
+            else if (operation.Path.Last == "-")
+            {
+                foreach (var value in jarr)
+                {
+                    ((JArray)token).Add(value);
+                }
+            }
+            else
+            {
+                throw new ArgumentException("Path must be an index or '-'");
+            }
+        }
+
+
+
         protected override void Remove(RemoveOperation operation)
         {
             JToken token = operation.Path.Find(_target);
