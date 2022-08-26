@@ -33,13 +33,23 @@ namespace Tavis
             else
             {
                 var tok = token[operation.Path.Last];
+
                 if (tok is JObject jobj)
                 {
                     jobj.Merge(operation.Value);
                 }
-                else if (tok is JArray jarr)
+                else if (tok is JArray dstjarr)
                 {
-                    jarr.Add(operation.Value);
+                    var srcjarr = operation.Value as JArray;
+                    if (srcjarr == null)
+                    {
+                        throw new ArgumentException("Value must be a JArray");
+                    }
+
+                    foreach (var value in srcjarr)
+                    {
+                        dstjarr.Add(value);
+                    }
                 }
                 else
                 {
