@@ -9,19 +9,19 @@ using Xunit;
 
 namespace JsonPatchTests
 {
-    public class AddTests
+    public class AddReplaceTests
     {
 
 
         [Fact]
-        public void Add_an_array_element()
+        public void AddReplace_an_array_element()
         {
             var sample = PatchTests.GetSample2();
 
             var patchDocument = new PatchDocument();
             var pointer = new JsonPointer("/books/-");
 
-            patchDocument.AddOperation(new AddOperation() { Path = pointer, Value = new JObject(new[] { new JProperty("author", "James Brown") }) });
+            patchDocument.AddOperation(new AddReplaceOperation() { Path = pointer, Value = new JObject(new[] { new JProperty("author", "James Brown") }) });
 
             patchDocument.ApplyTo(sample);
 
@@ -34,7 +34,7 @@ namespace JsonPatchTests
 
 
         [Fact]
-        public void Insert_an_array_element()
+        public void InsertReplace_an_array_element()
         {
 
             var sample = PatchTests.GetSample2();
@@ -42,7 +42,7 @@ namespace JsonPatchTests
             var patchDocument = new PatchDocument();
             var pointer = new JsonPointer("/books/0");
 
-            patchDocument.AddOperation(new AddOperation() { Path = pointer, Value = new JObject(new[] { new JProperty("author", "James Brown") }) });
+            patchDocument.AddOperation(new AddReplaceOperation() { Path = pointer, Value = new JObject(new[] { new JProperty("author", "James Brown") }) });
 
             patchDocument.ApplyTo(sample);
 
@@ -54,7 +54,7 @@ namespace JsonPatchTests
         }
 
         [Fact]
-        public void Add_an_existing_member_property()  // Why isn't this replace?
+        public void AddReplace_an_existing_member_property()  // Why isn't this replace?
         {
 
             var sample = PatchTests.GetSample2();
@@ -62,7 +62,7 @@ namespace JsonPatchTests
             var patchDocument = new PatchDocument();
             var pointer = new JsonPointer("/books/0/title");
 
-            patchDocument.AddOperation(new AddOperation() { Path = pointer, Value = new JValue("Little Red Riding Hood") });
+            patchDocument.AddOperation(new AddReplaceOperation() { Path = pointer, Value = new JValue("Little Red Riding Hood") });
 
             patchDocument.ApplyTo(sample);
 
@@ -73,7 +73,7 @@ namespace JsonPatchTests
         }
 
         [Fact]
-        public void Add_an_non_existing_member_property()  // Why isn't this replace?
+        public void AddReplace_an_non_existing_member_property()  // Why isn't this replace?
         {
 
             var sample = PatchTests.GetSample2();
@@ -81,7 +81,7 @@ namespace JsonPatchTests
             var patchDocument = new PatchDocument();
             var pointer = new JsonPointer("/books/0/ISBN");
 
-            patchDocument.AddOperation(new AddOperation() { Path = pointer, Value = new JValue("213324234343") });
+            patchDocument.AddOperation(new AddReplaceOperation() { Path = pointer, Value = new JValue("213324234343") });
 
             patchDocument.ApplyTo(sample);
 
@@ -92,26 +92,24 @@ namespace JsonPatchTests
         }
 
 
-
         [Fact]
-        public void Add_an_non_existing_object_noreplace()
+        public void AddReplace_an_non_existing_object_replace()
         {
             var sample = PatchTests.GetSample2();
 
             var patchDocument = new PatchDocument();
             var pointer = new JsonPointer("/books/0/attributes");
 
-            patchDocument.AddOperation(new AddOperation() { Path = pointer, Value = JToken.Parse("{ \"age\": 15 }") });
-            patchDocument.AddOperation(new AddOperation() { Path = pointer, Value = JToken.Parse("{ \"pages\": 200 }") });
+            patchDocument.AddOperation(new AddReplaceOperation() { Path = pointer, Value = JToken.Parse("{ \"age\": 15 }") });
+            patchDocument.AddOperation(new AddReplaceOperation() { Path = pointer, Value = JToken.Parse("{ \"pages\": 200 }") });
             patchDocument.ApplyTo(sample);
 
             var pointerAge = new JsonPointer("/books/0/attributes/age");
             var pointerPages = new JsonPointer("/books/0/attributes/pages");
 
-            var result = (string)pointerAge.Find(sample);
-            Assert.Equal("15", result);
+            Assert.Throws(typeof(PathNotFoundException), () => { pointerAge.Find(sample); });
 
-            result = (string)pointerPages.Find(sample);
+            var result = (string)pointerPages.Find(sample);
             Assert.Equal("200", result);
 
         }

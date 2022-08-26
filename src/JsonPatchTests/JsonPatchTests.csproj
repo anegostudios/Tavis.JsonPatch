@@ -55,6 +55,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AddEachTests.cs" />
+    <Compile Include="AddReplaceTests.cs" />
     <Compile Include="AddTests.cs" />
     <Compile Include="CopyTests.cs" />
     <Compile Include="MoveTests.cs" />

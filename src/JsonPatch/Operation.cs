@@ -57,6 +57,11 @@ namespace Tavis
         }
     }
 
+    public class AddReplaceOperation : AddOperation
+    {
+        
+    }
+
 
     public class AddEachOperation : Operation
     {

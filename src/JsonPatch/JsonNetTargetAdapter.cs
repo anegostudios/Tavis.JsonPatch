@@ -30,34 +30,62 @@ namespace Tavis
                 ((JArray)token).Insert(index, operation.Value);
             else if (operation.Path.Last == "-")
                 ((JArray)token).Add(operation.Value);
-            else token[operation.Path.Last] = operation.Value;
+            else
+            {
+                var tok = token[operation.Path.Last];
+                if (tok is JObject jobj)
+                {
+                    jobj.Merge(operation.Value);
+                }
+                else
+                {
+                    token[operation.Path.Last] = operation.Value;
+                }
+            }
         }
 
+        protected override void AddReplace(AddReplaceOperation operation)
+        {
+            var token = operation.Path.Find(_target, skipLast: true);
+
+            int index;
+            if (int.TryParse(operation.Path.Last, out index))
+                ((JArray)token).Insert(index, operation.Value);
+            else if (operation.Path.Last == "-")
+                ((JArray)token).Add(operation.Value);
+            else token[operation.Path.Last] = operation.Value;
+        }
 
         protected override void AddEach(AddEachOperation operation)
         {
             var token = operation.Path.Find(_target, skipLast: true);
 
-            var jarr = operation.Value as JArray;
+            var srcjarr = operation.Value as JArray;
+            var dstjarr = token as JArray;
 
-            if (jarr == null)
+            if (srcjarr == null)
             {
                 throw new ArgumentException("Value must be a JArray");
             }
+            if (dstjarr == null)
+            {
+                throw new ArgumentException("Target must be a JArray");
+            }
+            
 
             int index;
             if (int.TryParse(operation.Path.Last, out index))
             {
-                foreach (var value in jarr)
+                foreach (var value in srcjarr)
                 {
-                    ((JArray)token).Insert(index++, value);
+                    dstjarr.Insert(index++, value);
                 }
             }
             else if (operation.Path.Last == "-")
             {
-                foreach (var value in jarr)
+                foreach (var value in srcjarr)
                 {
-                    ((JArray)token).Add(value);
+                    dstjarr.Add(value);
                 }
             }
             else
@@ -72,12 +100,12 @@ namespace Tavis
         {
             JToken token = operation.Path.Find(_target);
 
-            if (token is JValue)
-            {
-                token.Parent.Remove();
-            } else
+            if (token.Parent is JArray)
             {
                 token.Remove();
+            } else
+            {
+                token.Parent.Remove();
             }
         }
 

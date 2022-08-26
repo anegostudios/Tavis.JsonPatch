@@ -73,6 +73,7 @@ namespace Tavis
             switch (op)
             {
                 case "add": return new AddOperation();
+                case "addreplace": return new AddReplaceOperation();
                 case "copy": return new CopyOperation();
                 case "move": return new MoveOperation();
                 case "remove": return new RemoveOperation();

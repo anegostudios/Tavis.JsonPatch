@@ -4,7 +4,8 @@
     {
         public void ApplyOperation(Operation operation)
         {
-            if (operation is AddOperation) Add((AddOperation)operation);
+            if (operation is AddReplaceOperation) AddReplace((AddReplaceOperation)operation);
+            else if (operation is AddOperation) Add((AddOperation)operation);
             else if (operation is AddEachOperation) AddEach((AddEachOperation)operation);
             else if (operation is CopyOperation) Copy((CopyOperation)operation);
             else if (operation is MoveOperation) Move((MoveOperation)operation);
@@ -14,6 +15,8 @@
         }
 
         protected abstract void Add(AddOperation operation);
+
+        protected abstract void AddReplace(AddReplaceOperation operation);
         protected abstract void AddEach(AddEachOperation operation);
         protected abstract void Copy(CopyOperation operation);
         protected abstract void Move(MoveOperation operation);
