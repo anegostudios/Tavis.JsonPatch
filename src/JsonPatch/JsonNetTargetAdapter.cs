@@ -37,6 +37,10 @@ namespace Tavis
                 {
                     jobj.Merge(operation.Value);
                 }
+                else if (tok is JArray jarr)
+                {
+                    jarr.Add(operation.Value);
+                }
                 else
                 {
                     token[operation.Path.Last] = operation.Value;
