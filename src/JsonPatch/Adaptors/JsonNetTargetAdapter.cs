@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Linq;
+using JsonPatch.Operations;
+using JsonPatch.Operations.Abstractions;
 using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
 
-namespace Tavis
+namespace JsonPatch.Adaptors
 {
     public class JsonNetTargetAdapter : BaseTargetAdapter
     {
@@ -14,7 +14,6 @@ namespace Tavis
             _target = target;
         }
 
-
         protected override void Replace(ReplaceOperation operation)
         {
             var token = operation.Path.Find(_target);
@@ -23,38 +22,51 @@ namespace Tavis
 
         protected override void Add(AddOperation operation)
         {
+            AddInsertPrepend(operation);
+        }
+
+        protected override void Insert(InsertOperation operation)
+        {
+            AddInsertPrepend(operation);
+        }
+
+        protected override void Prepend(PrependOperation operation)
+        {
+            operation.FixPath();
+            AddInsertPrepend(operation);
+        }
+
+        private void AddInsertPrepend(IValueOperation operation)
+        {
             var token = operation.Path.Find(_target, skipLast: true);
-
-            int index;
-            if (int.TryParse(operation.Path.Last, out index))
-                ((JArray)token).Insert(index, operation.Value);
-            else if (operation.Path.Last == "-")
-                ((JArray)token).Add(operation.Value);
-            else
+            if (int.TryParse(operation.Path.Last, out var index))
             {
-                var tok = token[operation.Path.Last];
+                ((JArray)token).Insert(index, operation.Value);
+                return;
+            }
 
-                if (tok is JObject jobj)
-                {
-                    jobj.Merge(operation.Value);
-                }
-                else if (tok is JArray dstjarr)
-                {
-                    var srcjarr = operation.Value as JArray;
-                    if (srcjarr == null)
-                    {
-                        throw new ArgumentException("Value must be a JArray");
-                    }
+            if (operation.Path.Last == "-")
+            {
+                ((JArray)token).Add(operation.Value);
+                return;
+            }
 
-                    foreach (var value in srcjarr)
-                    {
-                        dstjarr.Add(value);
-                    }
-                }
-                else
+            switch (token[operation.Path.Last])
+            {
+                case JObject jObject:
                 {
+                    jObject.Merge(operation.Value);
+                    return;
+                }
+                case JArray destinationJArray:
+                {
+                    if (!(operation.Value is JArray array)) throw new ArgumentException("Value must be a JArray");
+                    foreach (var value in array) destinationJArray.Add(value);
+                    return;
+                }
+                default:
                     token[operation.Path.Last] = operation.Value;
-                }
+                    break;
             }
         }
 
@@ -62,8 +74,7 @@ namespace Tavis
         {
             var token = operation.Path.Find(_target, skipLast: true);
 
-            int index;
-            if (int.TryParse(operation.Path.Last, out index))
+            if (int.TryParse(operation.Path.Last, out var index))
                 ((JArray)token).Insert(index, operation.Value);
             else if (operation.Path.Last == "-")
                 ((JArray)token).Add(operation.Value);
@@ -85,10 +96,9 @@ namespace Tavis
             {
                 throw new ArgumentException("Target must be a JArray");
             }
-            
 
-            int index;
-            if (int.TryParse(operation.Path.Last, out index))
+
+            if (int.TryParse(operation.Path.Last, out var index))
             {
                 foreach (var value in srcjarr)
                 {

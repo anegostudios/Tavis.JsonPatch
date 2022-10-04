@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using JsonPatch.Adaptors;
+using JsonPatch.Operations;
 using Newtonsoft.Json.Linq;
 using Tavis;
 using Xunit;

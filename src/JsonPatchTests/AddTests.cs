@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
+using JsonPatch.Operations;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Tavis;
 using Xunit;
@@ -11,8 +9,6 @@ namespace JsonPatchTests
 {
     public class AddTests
     {
-
-
         [Fact]
         public void Add_an_array_element()
         {
@@ -30,9 +26,7 @@ namespace JsonPatchTests
             Assert.Equal(3, list.Count);
             Assert.Equal(list[2]["author"].ToString(), "James Brown");
         }
-
-
-
+        
         [Fact]
         public void Insert_an_array_element()
         {
@@ -51,6 +45,24 @@ namespace JsonPatchTests
             Assert.Equal(3, list.Count);
             Assert.Equal((string)sample["books"][0]["author"], "James Brown");
 
+        }
+
+        [Fact]
+        public void Append_an_array_element()
+        {
+            var sample = PatchTests.GetSample2();
+
+            var patchDocument = new PatchDocument();
+            var pointer = new JsonPointer("/books/-");
+
+            patchDocument.AddOperation(new AddOperation { Path = pointer, Value = new JObject(new[] { new JProperty("author", "James Brown") }) });
+
+            patchDocument.ApplyTo(sample);
+
+            var list = sample["books"] as JArray;
+
+            Assert.Equal(3, list.Count);
+            Assert.Equal((string)sample["books"][2]["author"], "James Brown");
         }
 
         [Fact]
@@ -101,8 +113,8 @@ namespace JsonPatchTests
             var patchDocument = new PatchDocument();
             var pointer = new JsonPointer("/books/0/attributes");
 
-            patchDocument.AddOperation(new AddOperation() { Path = pointer, Value = JToken.Parse("{ \"age\": 15 }") });
-            patchDocument.AddOperation(new AddOperation() { Path = pointer, Value = JToken.Parse("{ \"pages\": 200 }") });
+            patchDocument.AddOperation(new AddOperation { Path = pointer, Value = JToken.Parse("{ age: 15 }") });
+            patchDocument.AddOperation(new AddOperation { Path = pointer, Value = JToken.Parse("{ pages: 200 }") });
             patchDocument.ApplyTo(sample);
 
             var pointerAge = new JsonPointer("/books/0/attributes/age");
@@ -116,5 +128,27 @@ namespace JsonPatchTests
 
         }
 
+        [Fact]
+        public void Write_ShouldApplyHyphenToPatch_WhenAppendingAnArray()
+        {
+            // Arrange
+            var expected = JToken.Parse("[{ op: \"add\", path: \"/books/-\", value: \"Little Red Riding Hood\" }]").ToString(Formatting.Indented);
+
+            var patchDocument = new PatchDocument();
+            var sut = new AddOperation { Path = new JsonPointer("/books/0"), Value = new JValue("Little Red Riding Hood") };
+            
+            // Act
+            patchDocument.AddOperation(sut);
+            var stream = patchDocument.ToStream();
+            var reader = new StreamReader(stream);
+
+            // Assert
+            var actual = reader.ReadToEnd();
+            Assert.Equal(expected, actual);
+
+            // Teardown
+            reader.Dispose();
+            stream.Dispose();
+        }
     }
 }

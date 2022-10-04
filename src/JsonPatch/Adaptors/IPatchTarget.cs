@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using JsonPatch.Operations.Abstractions;
 
-namespace Tavis
+namespace JsonPatch.Adaptors
 {
     public interface IPatchTarget
     {

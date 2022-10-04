@@ -60,6 +60,8 @@
     <Compile Include="AddTests.cs" />
     <Compile Include="CopyTests.cs" />
     <Compile Include="MoveTests.cs" />
+    <Compile Include="Operations\InsertOperationTests.cs" />
+    <Compile Include="Operations\PrependOperationTests.cs" />
     <Compile Include="PatchTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RemoveTests.cs" />
@@ -78,6 +80,7 @@
       <Name>Tavis.JsonPatch</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
