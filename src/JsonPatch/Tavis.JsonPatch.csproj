@@ -44,12 +44,24 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BaseTargetAdapter.cs" />
-    <Compile Include="IPatchTarget.cs" />
-    <Compile Include="JsonNetTargetAdapter.cs" />
+    <Compile Include="Adaptors\BaseTargetAdapter.cs" />
+    <Compile Include="Adaptors\IPatchTarget.cs" />
+    <Compile Include="Adaptors\JsonNetTargetAdapter.cs" />
     <Compile Include="JsonPointer.cs" />
-    <Compile Include="Operation.cs" />
+    <Compile Include="Operations\AddEachOperation.cs" />
+    <Compile Include="Operations\AddOperation.cs" />
+    <Compile Include="Operations\AddReplaceOperation.cs" />
+    <Compile Include="Operations\CopyOperation.cs" />
+    <Compile Include="Operations\InsertOperation.cs" />
+    <Compile Include="Operations\Abstractions\IValueOperation.cs" />
+    <Compile Include="Operations\MoveOperation.cs" />
+    <Compile Include="Operations\Abstractions\Operation.cs" />
+    <Compile Include="Operations\PrependOperation.cs" />
+    <Compile Include="Operations\RemoveOperation.cs" />
+    <Compile Include="Operations\ReplaceOperation.cs" />
+    <Compile Include="Operations\TestOperation.cs" />
     <Compile Include="PatchDocument.cs" />
+    <Compile Include="PathNotFoundException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

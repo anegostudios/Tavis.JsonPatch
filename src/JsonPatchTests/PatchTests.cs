@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
+using JsonPatch.Adaptors;
+using JsonPatch.Operations;
+using JsonPatch.Operations.Abstractions;
 using Newtonsoft.Json.Linq;
 using Tavis;
 using Xunit;
@@ -12,6 +10,9 @@ namespace JsonPatchTests
 {
     public class PatchTests
     {
+        /// <summary>
+        /// Creates the empty patch.
+        /// </summary>
         [Fact]
         public void CreateEmptyPatch()
         {
@@ -85,17 +86,17 @@ namespace JsonPatchTests
         public static JToken GetSample2()
         {
             return JToken.Parse(@"{
-    'books': [
-        {
-          'title' : 'The Great Gatsby',
-          'author' : 'F. Scott Fitzgerald'
-        },
-        {
-          'title' : 'The Grapes of Wrath',
-          'author' : 'John Steinbeck'
-        }
-    ]
-}");
+                'books': [
+                    {
+                      'title' : 'The Great Gatsby',
+                      'author' : 'F. Scott Fitzgerald'
+                    },
+                    {
+                      'title' : 'The Grapes of Wrath',
+                      'author' : 'John Steinbeck'
+                    }
+                ]
+            }");
         }
 
         public static JToken GetSample3()
