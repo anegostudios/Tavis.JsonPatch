@@ -25,7 +25,7 @@ namespace JsonPatchTests
                     }
             });
 
-            Assert.Throws(typeof(ArgumentException), () => {
+            Assert.Throws<ArgumentException>(() => {
                 patchDocument.ApplyTo(sample);
             });
         }
@@ -43,7 +43,7 @@ namespace JsonPatchTests
                 Value = new JObject(new[] { new JProperty("producer", "Kingston") })
             });
 
-            Assert.Throws(typeof(ArgumentException), () => {
+            Assert.Throws<ArgumentException>(() => {
                 patchDocument.ApplyTo(sample);
             });
         }

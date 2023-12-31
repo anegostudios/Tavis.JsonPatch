@@ -17,7 +17,7 @@ namespace JsonPatchTests
             var patchDocument = new PatchDocument();
             var pointer = new JsonPointer("/books/-");
 
-            patchDocument.AddOperation(new AddOperation() { Path = pointer, Value = new JObject(new[] { new JProperty("author", "James Brown") }) });
+            patchDocument.AddOperation(new AddMergeOperation() { Path = pointer, Value = new JObject(new[] { new JProperty("author", "James Brown") }) });
 
             patchDocument.ApplyTo(sample);
 
@@ -36,7 +36,7 @@ namespace JsonPatchTests
             var patchDocument = new PatchDocument();
             var pointer = new JsonPointer("/books/0");
 
-            patchDocument.AddOperation(new AddOperation() { Path = pointer, Value = new JObject(new[] { new JProperty("author", "James Brown") }) });
+            patchDocument.AddOperation(new AddMergeOperation() { Path = pointer, Value = new JObject(new[] { new JProperty("author", "James Brown") }) });
 
             patchDocument.ApplyTo(sample);
 
@@ -55,7 +55,7 @@ namespace JsonPatchTests
             var patchDocument = new PatchDocument();
             var pointer = new JsonPointer("/books/-");
 
-            patchDocument.AddOperation(new AddOperation { Path = pointer, Value = new JObject(new[] { new JProperty("author", "James Brown") }) });
+            patchDocument.AddOperation(new AddMergeOperation { Path = pointer, Value = new JObject(new[] { new JProperty("author", "James Brown") }) });
 
             patchDocument.ApplyTo(sample);
 
@@ -74,7 +74,7 @@ namespace JsonPatchTests
             var patchDocument = new PatchDocument();
             var pointer = new JsonPointer("/books/0/title");
 
-            patchDocument.AddOperation(new AddOperation() { Path = pointer, Value = new JValue("Little Red Riding Hood") });
+            patchDocument.AddOperation(new AddMergeOperation() { Path = pointer, Value = new JValue("Little Red Riding Hood") });
 
             patchDocument.ApplyTo(sample);
 
@@ -93,7 +93,7 @@ namespace JsonPatchTests
             var patchDocument = new PatchDocument();
             var pointer = new JsonPointer("/books/0/ISBN");
 
-            patchDocument.AddOperation(new AddOperation() { Path = pointer, Value = new JValue("213324234343") });
+            patchDocument.AddOperation(new AddMergeOperation() { Path = pointer, Value = new JValue("213324234343") });
 
             patchDocument.ApplyTo(sample);
 
@@ -113,8 +113,8 @@ namespace JsonPatchTests
             var patchDocument = new PatchDocument();
             var pointer = new JsonPointer("/books/0/attributes");
 
-            patchDocument.AddOperation(new AddOperation { Path = pointer, Value = JToken.Parse("{ age: 15 }") });
-            patchDocument.AddOperation(new AddOperation { Path = pointer, Value = JToken.Parse("{ pages: 200 }") });
+            patchDocument.AddOperation(new AddMergeOperation { Path = pointer, Value = JToken.Parse("{ age: 15 }") });
+            patchDocument.AddOperation(new AddMergeOperation { Path = pointer, Value = JToken.Parse("{ pages: 200 }") });
             patchDocument.ApplyTo(sample);
 
             var pointerAge = new JsonPointer("/books/0/attributes/age");
@@ -135,7 +135,7 @@ namespace JsonPatchTests
             var expected = JToken.Parse("[{ op: \"add\", path: \"/books/-\", value: \"Little Red Riding Hood\" }]").ToString(Formatting.Indented);
 
             var patchDocument = new PatchDocument();
-            var sut = new AddOperation { Path = new JsonPointer("/books/0"), Value = new JValue("Little Red Riding Hood") };
+            var sut = new AddMergeOperation { Path = new JsonPointer("/books/0"), Value = new JValue("Little Red Riding Hood") };
             
             // Act
             patchDocument.AddOperation(sut);

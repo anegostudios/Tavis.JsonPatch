@@ -3,8 +3,7 @@
 This library is (mostly) an implementation of a Json Patch [RFC 6902](http://tools.ietf.org/html/rfc6902).  
 
 Differences from the RFC 6902:
-* The `add` op performs a merge if the target is an object
-* New `addreplace` op implements the original `add` behavior.
+* New `addmerge` op performs a merge if the target is an object
 * New `addeach` op to add multiple values to an array
 
 

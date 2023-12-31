@@ -1,6 +1,6 @@
 ﻿namespace JsonPatch.Operations
 {
-    public class AddReplaceOperation : AddOperation
+    public class AddReplaceOperation : AddMergeOperation
     {
         
     }

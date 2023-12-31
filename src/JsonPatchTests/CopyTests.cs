@@ -34,7 +34,7 @@ namespace JsonPatchTests
             var frompointer = new JsonPointer("/books/0/ISBN");
             var topointer = new JsonPointer("/books/1/ISBN");
 
-            patchDocument.AddOperation(new AddOperation() { Path = frompointer, Value = new JValue("21123123") });
+            patchDocument.AddOperation(new AddMergeOperation() { Path = frompointer, Value = new JValue("21123123") });
             patchDocument.AddOperation(new CopyOperation() { FromPath = frompointer, Path = topointer });
 
             patchDocument.ApplyTo(sample);

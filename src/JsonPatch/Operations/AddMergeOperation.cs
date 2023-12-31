@@ -6,7 +6,7 @@ using Tavis;
 
 namespace JsonPatch.Operations
 {
-    public class AddOperation : Operation, IValueOperation
+    public class AddMergeOperation : Operation, IValueOperation
     {
         public JToken Value { get; set; }
 

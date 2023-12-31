@@ -12,8 +12,8 @@ namespace JsonPatch.Adaptors
                 case AddReplaceOperation replaceOperation:
                     AddReplace(replaceOperation);
                     break;
-                case AddOperation addOperation:
-                    Add(addOperation);
+                case AddMergeOperation addOperation:
+                    AddMerge(addOperation);
                     break;
                 case AddEachOperation eachOperation:
                     AddEach(eachOperation);
@@ -42,7 +42,7 @@ namespace JsonPatch.Adaptors
             }
         }
 
-        protected abstract void Add(AddOperation operation);
+        protected abstract void AddMerge(AddMergeOperation mergeOperation);
         protected abstract void AddReplace(AddReplaceOperation operation);
         protected abstract void AddEach(AddEachOperation operation);
         protected abstract void Copy(CopyOperation operation);

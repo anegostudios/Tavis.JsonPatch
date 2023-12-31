@@ -19,7 +19,7 @@ namespace JsonPatchTests
 
             patchDocument.AddOperation(new TestOperation() { Path = pointer, Value = new JValue("Billy Burton") });
 
-            Assert.Throws(typeof(InvalidOperationException), () =>
+            Assert.Throws<InvalidOperationException>(() =>
             {
                 patchDocument.ApplyTo(sample);
             });

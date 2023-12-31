@@ -103,7 +103,7 @@ namespace JsonPatchTests
             var pointerAge = new JsonPointer("/books/0/attributes/age");
             var pointerPages = new JsonPointer("/books/0/attributes/pages");
 
-            Assert.Throws(typeof(PathNotFoundException), () => { pointerAge.Find(sample); });
+            Assert.Throws<PathNotFoundException>(() => { pointerAge.Find(sample); });
 
             var result = (string)pointerPages.Find(sample);
             Assert.Equal("200", result);

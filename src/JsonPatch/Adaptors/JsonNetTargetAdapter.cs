@@ -20,9 +20,9 @@ namespace JsonPatch.Adaptors
             token.Replace(operation.Value);
         }
 
-        protected override void Add(AddOperation operation)
+        protected override void AddMerge(AddMergeOperation mergeOperation)
         {
-            AddInsertPrepend(operation);
+            AddInsertPrepend(mergeOperation);
         }
 
         protected override void Insert(InsertOperation operation)
@@ -139,7 +139,7 @@ namespace JsonPatch.Adaptors
                 throw new ArgumentException("To path cannot be below from path");
 
             var token = operation.FromPath.Find(_target);
-            Add(new AddOperation { Path = operation.Path, Value = token });
+            AddMerge(new AddMergeOperation { Path = operation.Path, Value = token });
             Remove(new RemoveOperation { Path = operation.FromPath });
         }
 
@@ -154,7 +154,7 @@ namespace JsonPatch.Adaptors
         {
             var token = operation.FromPath.Find(_target);
             token = token.DeepClone();
-            Add(new AddOperation { Path = operation.Path, Value = token });
+            AddMerge(new AddMergeOperation { Path = operation.Path, Value = token });
         }
     }
 }

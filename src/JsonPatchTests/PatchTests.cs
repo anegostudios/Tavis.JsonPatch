@@ -65,7 +65,7 @@ namespace JsonPatchTests
             {
              new TestOperation() {Path = new JsonPointer("/a/b/c"), Value = new JValue("foo")}, 
              new RemoveOperation() {Path = new JsonPointer("/a/b/c") }, 
-             new AddOperation() {Path = new JsonPointer("/a/b/c"), Value = new JArray(new JValue("foo"), new JValue("bar"))}, 
+             new AddMergeOperation() {Path = new JsonPointer("/a/b/c"), Value = new JArray(new JValue("foo"), new JValue("bar"))}, 
              new ReplaceOperation() {Path = new JsonPointer("/a/b/c"), Value = new JValue(42)}, 
              new MoveOperation() {FromPath = new JsonPointer("/a/b/c"), Path = new JsonPointer("/a/b/d") }, 
              new CopyOperation() {FromPath = new JsonPointer("/a/b/d"), Path = new JsonPointer("/a/b/e") }, 

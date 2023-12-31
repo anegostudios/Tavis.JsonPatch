@@ -61,8 +61,8 @@ namespace Tavis
         {
             switch (op)
             {
-                case "add": return new AddOperation();
-                case "append": return new AddOperation();
+                case "add": return new AddMergeOperation();
+                case "append": return new AddMergeOperation();
                 case "addeach": return new AddEachOperation();
                 case "addreplace": return new AddReplaceOperation();
                 case "copy": return new CopyOperation();
