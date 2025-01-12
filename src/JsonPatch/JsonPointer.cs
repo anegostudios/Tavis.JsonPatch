@@ -39,7 +39,7 @@ namespace Tavis
             {
                 var token  = Tokens[depth];
                 var parent = pointer;
-                var isInt = int.TryParse(token, out var index);
+                var isInt = int.TryParse(token, out var index) && (pointer is JArray);
 
                 Exception ex = null;
 
