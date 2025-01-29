@@ -1,9 +1,11 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using JsonPatch.Operations;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+
+
 using Tavis;
 using Xunit;
 
@@ -16,37 +18,43 @@ namespace JsonPatchTests.Operations
         private const string MockTitle = "The Eye of The World";
         private const string MockAuthor = "Robert Jordan";
 
-        private static JToken MockPatchData()
+        private static JsonObject MockPatchData()
         {
-            return JToken.Parse($@"{{
-                      'title' : '{MockTitle}',
-                      'author' : '{MockAuthor}'
-                    }}");
+            return JsonNode.Parse($$"""
+                {
+                    "title" : "{{MockTitle}}",
+                    "author" : "{{MockAuthor}}"
+                }
+                """)!.AsObject();
         }
 
-        private static JToken MockJsonFile()
+        private static JsonObject MockJsonFile()
         {
-            return JToken.Parse(@"{
-                'books': [
+            return JsonNode.Parse("""
+            {
+                "books": [
                     {
-                      'title' : 'The Great Gatsby',
-                      'author' : 'F. Scott Fitzgerald'
+                      "title" : "The Great Gatsby",
+                      "author" : "F. Scott Fitzgerald"
                     },
                     {
-                      'title' : 'The Grapes of Wrath',
-                      'author' : 'John Steinbeck'
+                      "title" : "The Grapes of Wrath",
+                      "author" : "John Steinbeck"
                     }
                 ]
-            }");
+            }
+            """)!.AsObject();
         }
 
-        private static JToken MockPatch()
+        private static JsonNode MockPatch()
         {
-            return JToken.Parse($@"[{{
-                'op': 'insert',
-                'path': '/books/1',
-                'value': {MockPatchData().ToString(Formatting.Indented)}
-            }}]");
+            return JsonNode.Parse($$"""
+                [{
+                    "op": "insert",
+                    "path": "/books/1",
+                    "value": {{MockPatchData().ToJsonString(new JsonSerializerOptions{WriteIndented = true})}}
+                }]
+                """);
         }
 
         #endregion
@@ -67,12 +75,12 @@ namespace JsonPatchTests.Operations
             patchDocument.AddOperation(sut);
             patchDocument.ApplyTo(sample);
 
-            var list = sample["books"].ToList();
+            var list = sample["books"].AsArray().ToList();
             Assert.Equal(3, list.Count);
 
             var actual = list[1];
-            Assert.Equal(MockAuthor, actual["author"].ToObject<string>());
-            Assert.Equal(MockTitle, actual["title"].ToObject<string>());
+            Assert.Equal(MockAuthor, actual["author"].GetValue<string>());
+            Assert.Equal(MockTitle, actual["title"].GetValue<string>());
         }
 
         [Fact]
@@ -89,12 +97,12 @@ namespace JsonPatchTests.Operations
             patchDocument.AddOperation(sut);
             patchDocument.ApplyTo(sample);
 
-            var list = sample["books"].ToList();
+            var list = sample["books"].AsArray().ToList();
             Assert.Equal(3, list.Count);
 
             var actual = list[2];
-            Assert.Equal(MockAuthor, actual["author"].ToObject<string>());
-            Assert.Equal(MockTitle, actual["title"].ToObject<string>());
+            Assert.Equal(MockAuthor, actual["author"].GetValue<string>());
+            Assert.Equal(MockTitle, actual["title"].GetValue<string>());
         }
 
         #endregion
@@ -133,7 +141,7 @@ namespace JsonPatchTests.Operations
             var patchDocument = new PatchDocument();
             patchDocument.AddOperation(sut);
 
-            Assert.Throws<ArgumentException>(() =>
+            Assert.Throws<InvalidOperationException>(() =>
             {
                 patchDocument.ApplyTo(sample);
             });
@@ -185,7 +193,7 @@ namespace JsonPatchTests.Operations
         public void Write_ShouldProduceInsertPatch_WhenCalled()
         {
             // Arrange
-            var expected = MockPatch().ToString(Formatting.Indented);
+            var expected = MockPatch().ToJsonString(new JsonSerializerOptions{WriteIndented = false});
             var patchDocument = new PatchDocument();
             var sut = new InsertOperation
             {

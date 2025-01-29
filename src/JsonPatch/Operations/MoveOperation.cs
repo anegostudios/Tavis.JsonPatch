@@ -1,6 +1,8 @@
-﻿using JsonPatch.Operations.Abstractions;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using System.Text.Json;
+using System.Text.Json.Nodes;
+using JsonPatch.Operations.Abstractions;
+
+
 using Tavis;
 
 namespace JsonPatch.Operations
@@ -9,7 +11,7 @@ namespace JsonPatch.Operations
     {
         public JsonPointer FromPath { get; set; }
 
-        public override void Write(JsonWriter writer)
+        public override void Write(Utf8JsonWriter writer)
         {
             writer.WriteStartObject();
 
@@ -20,10 +22,10 @@ namespace JsonPatch.Operations
             writer.WriteEndObject();
         }
 
-        public override void Read(JObject jOperation)
+        public override void Read(JsonObject jOperation)
         {
-            Path = new JsonPointer((string)jOperation.GetValue("path"));
-            FromPath = new JsonPointer((string)jOperation.GetValue("from"));
+            Path = new JsonPointer(jOperation["path"].GetValue<string>());
+            FromPath = new JsonPointer(jOperation["from"].GetValue<string>());
         }
     }
 }

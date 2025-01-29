@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+
 
 // ReSharper disable UnusedMember.Global
 
@@ -31,9 +33,9 @@ namespace Tavis
                 .ToList();
         }
 
-        public JToken Find(JToken sample, bool skipLast = false)
+        public JsonNode Find(JsonNode sample, bool skipLast = false)
         {
-            var pointer = sample;
+            JsonNode pointer = sample;
             var length = Depth - (skipLast ? 1 : 0);
             for (var depth = 0; depth < length; depth++)
             {
@@ -52,7 +54,7 @@ namespace Tavis
                 }
 
                 if (pointer != null) continue;
-                if (depth <= 0)
+                if (depth <= 0) 
                     throw new PathNotFoundException(
                         $"The json path {_origPointer} was not found. No such element '{Tokens[0]}' at the root path", ex);
                 var foundPath = Tokens.Take(depth).Aggregate("", (a,b) => a +"/"+b);

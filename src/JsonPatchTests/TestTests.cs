@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Text.Json.Nodes;
 using JsonPatch.Operations;
-using Newtonsoft.Json.Linq;
+
 using Tavis;
 using Xunit;
 
@@ -17,7 +18,7 @@ namespace JsonPatchTests
             var patchDocument = new PatchDocument();
             var pointer = new JsonPointer("/books/0/author");
 
-            patchDocument.AddOperation(new TestOperation() { Path = pointer, Value = new JValue("Billy Burton") });
+            patchDocument.AddOperation(new TestOperation() { Path = pointer, Value = JsonValue.Create("Billy Burton") });
 
             Assert.Throws<InvalidOperationException>(() =>
             {

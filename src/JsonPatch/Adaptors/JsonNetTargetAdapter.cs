@@ -1,15 +1,19 @@
 ﻿using System;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 using JsonPatch.Operations;
 using JsonPatch.Operations.Abstractions;
-using Newtonsoft.Json.Linq;
+using Tavis;
+
 
 namespace JsonPatch.Adaptors
 {
     public class JsonNetTargetAdapter : BaseTargetAdapter
     {
-        private readonly JToken _target;
+        private readonly JsonNode _target;
 
-        public JsonNetTargetAdapter(JToken target)
+        public JsonNetTargetAdapter(JsonNode target)
         {
             _target = target;
         }
@@ -17,7 +21,7 @@ namespace JsonPatch.Adaptors
         protected override void Replace(ReplaceOperation operation)
         {
             var token = operation.Path.Find(_target);
-            token.Replace(operation.Value);
+            token.Parent[operation.Path.Last] = operation.Value;
         }
 
         protected override void AddMerge(AddMergeOperation mergeOperation)
@@ -41,31 +45,35 @@ namespace JsonPatch.Adaptors
             var token = operation.Path.Find(_target, skipLast: true);
             if (int.TryParse(operation.Path.Last, out var index))
             {
-                ((JArray)token).Insert(index, operation.Value);
+                token.AsArray().Insert(index, operation.Value);
                 return;
             }
 
             if (operation.Path.Last == "-")
             {
-                ((JArray)token).Add(operation.Value);
+                token.AsArray().Add(operation.Value);
                 return;
             }
 
             switch (token[operation.Path.Last])
             {
-                case JObject jObject:
+                case JsonObject jObject:
                 {
-                    jObject.Merge(operation.Value);
+                    foreach (var (key, value) in operation.Value.AsObject())
+                    {
+                        jObject.Add(key, JsonSerializer.SerializeToNode(value));
+                    }
+
                     return;
                 }
-                case JArray destinationJArray:
+                case JsonArray destinationJsonArray:
                 {
-                    if (!(operation.Value is JArray array)) throw new ArgumentException("Value must be a JArray");
-                    foreach (var value in array) destinationJArray.Add(value);
+                    if (operation.Value is not JsonArray array) throw new ArgumentException("Value must be a JsonArray");
+                    foreach (var value in array) destinationJsonArray.Add(value);
                     return;
                 }
                 default:
-                    token[operation.Path.Last] = operation.Value;
+                    token[operation.Path.Last] = JsonSerializer.SerializeToNode(operation.Value);
                     break;
             }
         }
@@ -75,9 +83,9 @@ namespace JsonPatch.Adaptors
             var token = operation.Path.Find(_target, skipLast: true);
 
             if (int.TryParse(operation.Path.Last, out var index))
-                ((JArray)token).Insert(index, operation.Value);
+                token.AsArray().Insert(index, operation.Value);
             else if (operation.Path.Last == "-")
-                ((JArray)token).Add(operation.Value);
+                token.AsArray().Add(operation.Value);
             else token[operation.Path.Last] = operation.Value;
         }
 
@@ -85,16 +93,16 @@ namespace JsonPatch.Adaptors
         {
             var token = operation.Path.Find(_target, skipLast: true);
 
-            var srcjarr = operation.Value as JArray;
-            var dstjarr = token as JArray;
+            var srcjarr = operation.Value as JsonArray;
+            var dstjarr = token.AsArray();
 
             if (srcjarr == null)
             {
-                throw new ArgumentException("Value must be a JArray");
+                throw new ArgumentException("Value must be a JsonArray");
             }
             if (dstjarr == null)
             {
-                throw new ArgumentException("Target must be a JArray");
+                throw new ArgumentException("Target must be a JsonArray");
             }
 
 
@@ -102,14 +110,14 @@ namespace JsonPatch.Adaptors
             {
                 foreach (var value in srcjarr)
                 {
-                    dstjarr.Insert(index++, value);
+                    dstjarr.Insert(index++, JsonSerializer.SerializeToNode(value));
                 }
             }
             else if (operation.Path.Last == "-")
             {
                 foreach (var value in srcjarr)
                 {
-                    dstjarr.Add(value);
+                    dstjarr.Add(JsonSerializer.SerializeToNode(value));
                 }
             }
             else
@@ -122,14 +130,15 @@ namespace JsonPatch.Adaptors
 
         protected override void Remove(RemoveOperation operation)
         {
-            JToken token = operation.Path.Find(_target);
+            var token = operation.Path.Find(_target);
 
-            if (token.Parent is JArray)
+            if (token.Parent is JsonArray ja)
             {
-                token.Remove();
+                ja.Remove(token);
             } else
             {
-                token.Parent.Remove();
+                // TODO
+                token.Parent.AsObject().Remove(token.GetPath());
             }
         }
 
@@ -139,7 +148,7 @@ namespace JsonPatch.Adaptors
                 throw new ArgumentException("To path cannot be below from path");
 
             var token = operation.FromPath.Find(_target);
-            AddMerge(new AddMergeOperation { Path = operation.Path, Value = token });
+            AddMerge(new AddMergeOperation { Path = operation.Path, Value = JsonSerializer.SerializeToNode(token) });
             Remove(new RemoveOperation { Path = operation.FromPath });
         }
 
@@ -153,8 +162,8 @@ namespace JsonPatch.Adaptors
         protected override void Copy(CopyOperation operation)
         {
             var token = operation.FromPath.Find(_target);
-            token = token.DeepClone();
-            AddMerge(new AddMergeOperation { Path = operation.Path, Value = token });
+            var copyValue = JsonSerializer.SerializeToNode(token);
+            AddMerge(new AddMergeOperation { Path = operation.Path, Value = copyValue });
         }
     }
 }

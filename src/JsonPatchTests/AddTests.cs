@@ -1,7 +1,7 @@
 ﻿using System.IO;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using JsonPatch.Operations;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Tavis;
 using Xunit;
 
@@ -16,12 +16,13 @@ namespace JsonPatchTests
 
             var patchDocument = new PatchDocument();
             var pointer = new JsonPointer("/books/-");
-
-            patchDocument.AddOperation(new AddMergeOperation() { Path = pointer, Value = new JObject(new[] { new JProperty("author", "James Brown") }) });
+            var value = new JsonObject();
+            value["author"] = "James Brown";
+            patchDocument.AddOperation(new AddMergeOperation() { Path = pointer, Value = value });
 
             patchDocument.ApplyTo(sample);
 
-            var list = sample["books"] as JArray;
+            var list = sample["books"] as JsonArray;
 
             Assert.Equal(3, list.Count);
             Assert.Equal(list[2]["author"].ToString(), "James Brown");
@@ -36,11 +37,13 @@ namespace JsonPatchTests
             var patchDocument = new PatchDocument();
             var pointer = new JsonPointer("/books/0");
 
-            patchDocument.AddOperation(new AddMergeOperation() { Path = pointer, Value = new JObject(new[] { new JProperty("author", "James Brown") }) });
+            var value = new JsonObject();
+            value["author"] = "James Brown";
+            patchDocument.AddOperation(new AddMergeOperation() { Path = pointer, Value = value });
 
             patchDocument.ApplyTo(sample);
 
-            var list = sample["books"] as JArray;
+            var list = sample["books"] as JsonArray;
 
             Assert.Equal(3, list.Count);
             Assert.Equal((string)sample["books"][0]["author"], "James Brown");
@@ -55,11 +58,13 @@ namespace JsonPatchTests
             var patchDocument = new PatchDocument();
             var pointer = new JsonPointer("/books/-");
 
-            patchDocument.AddOperation(new AddMergeOperation { Path = pointer, Value = new JObject(new[] { new JProperty("author", "James Brown") }) });
+            var value = new JsonObject();
+            value["author"] = "James Brown";
+            patchDocument.AddOperation(new AddMergeOperation { Path = pointer, Value = value });
 
             patchDocument.ApplyTo(sample);
 
-            var list = sample["books"] as JArray;
+            var list = sample["books"] as JsonArray;
 
             Assert.Equal(3, list.Count);
             Assert.Equal((string)sample["books"][2]["author"], "James Brown");
@@ -74,7 +79,7 @@ namespace JsonPatchTests
             var patchDocument = new PatchDocument();
             var pointer = new JsonPointer("/books/0/title");
 
-            patchDocument.AddOperation(new AddMergeOperation() { Path = pointer, Value = new JValue("Little Red Riding Hood") });
+            patchDocument.AddOperation(new AddMergeOperation() { Path = pointer, Value = JsonValue.Create("Little Red Riding Hood") });
 
             patchDocument.ApplyTo(sample);
 
@@ -93,7 +98,7 @@ namespace JsonPatchTests
             var patchDocument = new PatchDocument();
             var pointer = new JsonPointer("/books/0/ISBN");
 
-            patchDocument.AddOperation(new AddMergeOperation() { Path = pointer, Value = new JValue("213324234343") });
+            patchDocument.AddOperation(new AddMergeOperation() { Path = pointer, Value = JsonValue.Create("213324234343") });
 
             patchDocument.ApplyTo(sample);
 
@@ -113,18 +118,18 @@ namespace JsonPatchTests
             var patchDocument = new PatchDocument();
             var pointer = new JsonPointer("/books/0/attributes");
 
-            patchDocument.AddOperation(new AddMergeOperation { Path = pointer, Value = JToken.Parse("{ age: 15 }") });
-            patchDocument.AddOperation(new AddMergeOperation { Path = pointer, Value = JToken.Parse("{ pages: 200 }") });
+            patchDocument.AddOperation(new AddMergeOperation { Path = pointer, Value = JsonNode.Parse("""{ "age": 15 }""")!.AsObject() });
+            patchDocument.AddOperation(new AddMergeOperation { Path = pointer, Value = JsonNode.Parse("""{ "pages": 200 }""")!.AsObject() });
             patchDocument.ApplyTo(sample);
 
             var pointerAge = new JsonPointer("/books/0/attributes/age");
             var pointerPages = new JsonPointer("/books/0/attributes/pages");
 
-            var result = (string)pointerAge.Find(sample);
-            Assert.Equal("15", result);
+            var result = (int)pointerAge.Find(sample);
+            Assert.Equal(15, result);
 
-            result = (string)pointerPages.Find(sample);
-            Assert.Equal("200", result);
+            result = (int)pointerPages.Find(sample);
+            Assert.Equal(200, result);
 
         }
 
@@ -132,10 +137,10 @@ namespace JsonPatchTests
         public void Write_ShouldApplyHyphenToPatch_WhenAppendingAnArray()
         {
             // Arrange
-            var expected = JToken.Parse("[{ op: \"add\", path: \"/books/-\", value: \"Little Red Riding Hood\" }]").ToString(Formatting.Indented);
+            var expected = JsonNode.Parse("""[{ "op": "add", "path": "/books/-", "value": "Little Red Riding Hood" }]""")!.ToJsonString(new JsonSerializerOptions{WriteIndented = false});
 
             var patchDocument = new PatchDocument();
-            var sut = new AddMergeOperation { Path = new JsonPointer("/books/0"), Value = new JValue("Little Red Riding Hood") };
+            var sut = new AddMergeOperation { Path = new JsonPointer("/books/0"), Value = JsonValue.Create("Little Red Riding Hood") };
             
             // Act
             patchDocument.AddOperation(sut);

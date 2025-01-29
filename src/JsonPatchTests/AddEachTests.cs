@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text.Json.Nodes;
 using JsonPatch.Operations;
-using Newtonsoft.Json.Linq;
+
 using Tavis;
 using Xunit;
 
@@ -15,14 +17,25 @@ namespace JsonPatchTests
 
             var patchDocument = new PatchDocument();
             var pointer = new JsonPointer("/books/");
-            patchDocument.AddOperation(new AddEachOperation()
+
+            patchDocument.AddOperation(new AddEachOperation
             {
                 Path = pointer,
-                Value = new JArray() {
-                        new JObject(new[] { new JProperty("author", "James Brown") }),
-                        new JObject(new[] { new JProperty("cat", "Garfield") }),
-                        new JObject(new[] { new JProperty("producer", "Kingston") }),
+                Value = new JsonArray
+                {
+                    new JsonObject
+                    {
+                        ["author"] = "James Brown"
+                    },
+                    new JsonObject
+                    {
+                        ["cat"] = "Garfield"
+                    },
+                    new JsonObject
+                    {
+                        ["producer"] = "Kingston"
                     }
+                }
             });
 
             Assert.Throws<ArgumentException>(() => {
@@ -37,10 +50,14 @@ namespace JsonPatchTests
 
             var patchDocument = new PatchDocument();
             var pointer = new JsonPointer("/books/");
+            
             patchDocument.AddOperation(new AddEachOperation()
             {
                 Path = pointer,
-                Value = new JObject(new[] { new JProperty("producer", "Kingston") })
+                Value = new JsonArray
+                {
+                    new KeyValuePair<string, JsonNode>("producer", "Kingston")
+                }
             });
 
             Assert.Throws<ArgumentException>(() => {
@@ -58,18 +75,29 @@ namespace JsonPatchTests
             var pointer = new JsonPointer("/books/-");
 
             patchDocument.AddOperation(new AddEachOperation()
-            {
-                Path = pointer,
-                Value = new JArray() {
-                new JObject(new[] { new JProperty("author", "James Brown") }),
-                new JObject(new[] { new JProperty("cat", "Garfield") }),
-                new JObject(new[] { new JProperty("producer", "Kingston") }),
-            }
-            });
+                {
+                    Path = pointer,
+                    Value = new JsonArray
+                    {
+                        new JsonObject
+                        {
+                            ["author"] = "James Brown"
+                        },
+                        new JsonObject
+                        {
+                            ["cat"] = "Garfield"
+                        },
+                        new JsonObject
+                        {
+                            ["producer"] = "Kingston"
+                        }
+                    }
+                }
+            );
 
             patchDocument.ApplyTo(sample);
 
-            var list = sample["books"] as JArray;
+            var list = sample["books"] as JsonArray;
 
             Assert.Equal(5, list.Count);
             Assert.Equal(list[2]["author"].ToString(), "James Brown");
@@ -85,28 +113,34 @@ namespace JsonPatchTests
 
             var patchDocument = new PatchDocument();
             var pointer = new JsonPointer("/books/0");
-
             patchDocument.AddOperation(new AddEachOperation()
             {
                 Path = pointer,
-                Value = new JArray() {
-                new JObject(new[] { new JProperty("author", "James Brown") }),
-                new JObject(new[] { new JProperty("cat", "Garfield") }),
-                new JObject(new[] { new JProperty("producer", "Kingston") }),
-            }
+                Value = new JsonArray
+                {
+                    new JsonObject
+                    {
+                        ["author"] = "James Brown"
+                    },
+                    new JsonObject
+                    {
+                        ["cat"] = "Garfield"
+                    },
+                    new JsonObject
+                    {
+                        ["producer"] = "Kingston"
+                    }
+                }
             });
 
             patchDocument.ApplyTo(sample);
 
-            var list = sample["books"] as JArray;
+            var list = sample["books"] as JsonArray;
 
             Assert.Equal(5, list.Count);
             Assert.Equal(list[0]["author"].ToString(), "James Brown");
             Assert.Equal(list[1]["cat"].ToString(), "Garfield");
             Assert.Equal(list[2]["producer"].ToString(), "Kingston");
         }
-
-
-
     }
 }

@@ -1,6 +1,6 @@
-﻿using JsonPatch.Adaptors;
+﻿using System.Text.Json.Nodes;
+using JsonPatch.Adaptors;
 using JsonPatch.Operations;
-using Newtonsoft.Json.Linq;
 using Tavis;
 using Xunit;
 
@@ -17,7 +17,7 @@ namespace JsonPatchTests
             var patchDocument = new PatchDocument();
             var pointer = new JsonPointer("/books/0/author");
 
-            patchDocument.AddOperation(new ReplaceOperation() { Path = pointer, Value = new JValue("Bob Brown") });
+            patchDocument.AddOperation(new ReplaceOperation() { Path = pointer, Value = JsonValue.Create("Bob Brown") });
 
             patchDocument.ApplyTo(new JsonNetTargetAdapter(sample));
 
@@ -32,8 +32,9 @@ namespace JsonPatchTests
 
             var patchDocument = new PatchDocument();
             var pointer = new JsonPointer("/books/0/author");
-
-            patchDocument.AddOperation(new ReplaceOperation() { Path = pointer, Value = new JObject(new[] { new JProperty("hello", "world") }) });
+            var value = new JsonObject();
+            value["hello"] = "world";
+            patchDocument.AddOperation(new ReplaceOperation() { Path = pointer, Value = value });
 
             patchDocument.ApplyTo(new JsonNetTargetAdapter(sample));
 

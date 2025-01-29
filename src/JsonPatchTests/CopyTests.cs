@@ -1,5 +1,6 @@
-﻿using JsonPatch.Operations;
-using Newtonsoft.Json.Linq;
+﻿using System.Text.Json.Nodes;
+using JsonPatch.Operations;
+
 using Tavis;
 using Xunit;
 
@@ -21,7 +22,7 @@ namespace JsonPatchTests
             patchDocument.ApplyTo(sample);
 
             var result = new JsonPointer("/books/2").Find(sample);
-            Assert.IsType(typeof(JObject), result);
+            Assert.IsType(typeof(JsonObject), result);
 
         }
 
@@ -34,13 +35,14 @@ namespace JsonPatchTests
             var frompointer = new JsonPointer("/books/0/ISBN");
             var topointer = new JsonPointer("/books/1/ISBN");
 
-            patchDocument.AddOperation(new AddMergeOperation() { Path = frompointer, Value = new JValue("21123123") });
+            var jsonValue = JsonValue.Create("21123123");
+            patchDocument.AddOperation(new AddMergeOperation() { Path = frompointer, Value = jsonValue });
             patchDocument.AddOperation(new CopyOperation() { FromPath = frompointer, Path = topointer });
 
             patchDocument.ApplyTo(sample);
 
             var result = new JsonPointer("/books/1/ISBN").Find(sample);
-            Assert.Equal("21123123", result);
+            Assert.Equal(jsonValue.ToJsonString(), result.ToJsonString());
         }
     }
 }

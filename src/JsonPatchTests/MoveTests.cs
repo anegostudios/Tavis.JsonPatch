@@ -1,5 +1,6 @@
-﻿using JsonPatch.Operations;
-using Newtonsoft.Json.Linq;
+﻿using System.Text.Json.Nodes;
+using JsonPatch.Operations;
+
 using Tavis;
 using Xunit;
 
@@ -41,7 +42,7 @@ namespace JsonPatchTests
 
 
             var result = topointer.Find(sample);
-            Assert.IsType(typeof(JObject), result);
+            Assert.IsType(typeof(JsonObject), result);
         }
 
 

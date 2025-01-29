@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿
+using System.Text.Json.Nodes;
 using Tavis;
 
 namespace JsonPatch.Operations.Abstractions
@@ -6,6 +7,6 @@ namespace JsonPatch.Operations.Abstractions
     public interface IValueOperation
     {
         JsonPointer Path { get; }
-        JToken Value { get; }
+        JsonNode Value { get; }
     }
 }

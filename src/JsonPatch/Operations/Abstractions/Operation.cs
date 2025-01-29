@@ -1,5 +1,7 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿
+
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using Tavis;
 
 namespace JsonPatch.Operations.Abstractions
@@ -8,31 +10,31 @@ namespace JsonPatch.Operations.Abstractions
     {
         public JsonPointer Path { get; set; }
 
-        public abstract void Write(JsonWriter writer);
+        public abstract void Write(Utf8JsonWriter writer);
 
-        protected static void WriteOp(JsonWriter writer, string op)
+        protected static void WriteOp(Utf8JsonWriter writer, string op)
         {
             writer.WritePropertyName("op");
-            writer.WriteValue(op);
+            writer.WriteStringValue(op);
         }
 
-        protected static void WritePath(JsonWriter writer, JsonPointer pointer)
+        protected static void WritePath(Utf8JsonWriter writer, JsonPointer pointer)
         {
             writer.WritePropertyName("path");
-            writer.WriteValue(pointer.ToString());
+            writer.WriteStringValue(pointer.ToString());
         }
 
-        protected static void WriteFromPath(JsonWriter writer, JsonPointer pointer)
+        protected static void WriteFromPath(Utf8JsonWriter writer, JsonPointer pointer)
         {
             writer.WritePropertyName("from");
-            writer.WriteValue(pointer.ToString());
+            writer.WriteStringValue(pointer.ToString());
         }
-        protected static void WriteValue(JsonWriter writer, JToken value)
+        protected static void WriteValue(Utf8JsonWriter writer, JsonNode value)
         {
             writer.WritePropertyName("value");
             value.WriteTo(writer);
         }
 
-        public abstract void Read(JObject jOperation);
+        public abstract void Read(JsonObject jOperation);
     }
 }

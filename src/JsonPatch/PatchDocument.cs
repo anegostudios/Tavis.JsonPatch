@@ -1,11 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Xml;
 using JsonPatch.Adaptors;
 using JsonPatch.Operations;
 using JsonPatch.Operations.Abstractions;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+
+
 
 // ReSharper disable CheckNamespace
 // ReSharper disable StringLiteralTypo
@@ -24,7 +27,7 @@ namespace Tavis
             }
         }
 
-        public void ApplyTo(JToken jToken) => ApplyTo(new JsonNetTargetAdapter(jToken));
+        public void ApplyTo(JsonNode jToken) => ApplyTo(new JsonNetTargetAdapter(jToken));
 
         public void ApplyTo(IPatchTarget target)
         {
@@ -47,11 +50,11 @@ namespace Tavis
         public static PatchDocument Parse(string jsonDocument)
         {
             var document = new PatchDocument();
-            if (!(JToken.Parse(jsonDocument) is JArray root)) return document;
-            foreach (var jOperation in root.Children().Cast<JObject>())
+            if (!(JsonObject.Parse(jsonDocument) is JsonArray root)) return document;
+            foreach (var jOperation in root)
             {
                 var op = CreateOperation((string)jOperation["op"]);
-                op.Read(jOperation);
+                op.Read(jOperation.AsObject());
                 document.AddOperation(op);
             }
             return document;
@@ -95,10 +98,7 @@ namespace Tavis
         /// <param name="stream"></param>
         public void CopyToStream(Stream stream)
         {
-            var sw = new JsonTextWriter(new StreamWriter(stream))
-            {
-                Formatting = Formatting.Indented
-            };
+            var sw = new Utf8JsonWriter(stream);
             sw.WriteStartArray();
             foreach (var operation in Operations)
             {
