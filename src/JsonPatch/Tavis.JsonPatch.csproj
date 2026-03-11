@@ -2,14 +2,14 @@
   <PropertyGroup>
     <RootNamespace>JsonPatch</RootNamespace>
     <AssemblyName>Tavis.JsonPatch</AssemblyName>
-    <TargetFrameworks>net7.0;net8.0</TargetFrameworks>
+    <TargetFramework>net10.0</TargetFramework>
     <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
-    <Version>0.5.3-vs.1</Version>
+    <Version>0.5.3-vs.2</Version>
     <RepositoryUrl>https://github.com/anegostudios/Tavis.JsonPatch</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
 
 </Project>
