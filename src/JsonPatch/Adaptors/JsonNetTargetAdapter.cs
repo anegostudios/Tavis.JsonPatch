@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using JsonPatch.Operations;
 using JsonPatch.Operations.Abstractions;
 using Newtonsoft.Json.Linq;
@@ -135,7 +136,7 @@ namespace JsonPatch.Adaptors
 
         protected override void Move(MoveOperation operation)
         {
-            if (operation.Path.ToString().StartsWith(operation.FromPath.ToString()))
+            if (operation.FromPath.Tokens.Zip(operation.Path.Tokens, (a, b) => a.Equals(b)).Aggregate(true, (acc, v) => acc && v))
                 throw new ArgumentException("To path cannot be below from path");
 
             var token = operation.FromPath.Find(_target);

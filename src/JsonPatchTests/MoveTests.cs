@@ -44,6 +44,21 @@ namespace JsonPatchTests
             Assert.IsType(typeof(JObject), result);
         }
 
+        [Fact]
+        public void Move_similar_named_paths()
+        {
+            var sample = PatchTests.GetSample2();
 
+            var patchDocument = new PatchDocument();
+            var frompointer = new JsonPointer("/books");
+            var topointer = new JsonPointer("/bookshelf");
+
+            patchDocument.AddOperation(new MoveOperation() { FromPath = frompointer, Path = topointer });
+
+            patchDocument.ApplyTo(sample);
+
+            var result = topointer.Find(sample);
+            Assert.IsType<JArray>(result);
+        }
     }
 }
